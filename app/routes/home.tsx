@@ -1,13 +1,42 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import ResumeCard from '~/components/ResumeCard';
+import { resumes } from '../../constants';
+import type { Route } from './+types/home';
+import Navbar from '~/components/Navbar';
+import { usePuterStore } from 'lib/puter';
+import { useNavigate } from 'react-router';
+import { useEffect } from 'react';
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: 'HireScan' },
+    { name: 'description', content: 'Hire Better with AI Resume Scanning.' },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  const { auth } = usePuterStore();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!auth.isAuthenticated) navigate('/auth?next=/');
+  }, [auth.isAuthenticated]);
+  return (
+    <main className="bg-[url('/images/bg-main.svg')] bg-cover min-h-screen">
+      <div className="container mx-auto px-4">
+        <Navbar />
+        <section className="main-section">
+          <div className="page-heading py-6">
+            <h1>Hire Better with AI Resume Scanning.</h1>
+            <p>Automated resume analysis and scoring to speed up your hiring process.</p>
+          </div>
+          {resumes.length > 0 && (
+            <div className="resumes-section">
+              {resumes.map((resume) => {
+                return <ResumeCard key={resume.id} resume={resume} />;
+              })}
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
 }
